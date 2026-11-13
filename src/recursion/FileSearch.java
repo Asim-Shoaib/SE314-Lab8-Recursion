@@ -64,7 +64,7 @@ public class FileSearch {
             List<File> found) {
         File[] entries = dir.listFiles();
         if (entries == null) {
-            return; // base case: empty listing, e.g. no read permission
+            return; // directory could not be read (e.g. no permission)
         }
         Arrays.sort(entries);
         for (File entry : entries) {
