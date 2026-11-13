@@ -21,7 +21,8 @@ public class FileSearch {
      * @param fileName name to look for, not empty
      * @param caseSensitive false to compare names ignoring case
      * @return matching files in visiting order (entries sorted by name); empty list if none
-     * @throws IllegalArgumentException if dir is not an existing directory or fileName is empty
+     * @throws IllegalArgumentException if dir is not an existing directory
+     *         or fileName is empty
      */
     public static List<File> search(File dir, String fileName, boolean caseSensitive) {
         if (dir == null || !dir.isDirectory()) {
@@ -46,9 +47,11 @@ public class FileSearch {
     /**
      * Searches for several names in one run.
      *
-     * @return map from each name (in the given order) to its matches; same preconditions as search()
+     * @return map from each name (in the given order) to its matches
+     *         same preconditions as search()
      */
-    public static Map<String, List<File>> searchAll(File dir, List<String> fileNames, boolean caseSensitive) {
+    public static Map<String, List<File>> searchAll(File dir, List<String> fileNames,
+            boolean caseSensitive) {
         Map<String, List<File>> results = new LinkedHashMap<>();
         for (String name : fileNames) {
             results.put(name, search(dir, name, caseSensitive));
@@ -57,7 +60,8 @@ public class FileSearch {
     }
 
     // Adds every match under dir to found.
-    private static void searchIn(File dir, String fileName, boolean caseSensitive, List<File> found) {
+    private static void searchIn(File dir, String fileName, boolean caseSensitive,
+            List<File> found) {
         File[] entries = dir.listFiles();
         if (entries == null) {
             return; // base case: empty listing, e.g. no read permission
@@ -66,24 +70,31 @@ public class FileSearch {
         for (File entry : entries) {
             if (entry.isDirectory()) {
                 searchIn(entry, fileName, caseSensitive, found); // recursive step
-            } else if (caseSensitive ? entry.getName().equals(fileName) : entry.getName().equalsIgnoreCase(fileName)) {
+            } else if (sameName(entry.getName(), fileName, caseSensitive)) {
                 found.add(entry);
             }
         }
+    }
+
+    private static boolean sameName(String a, String b, boolean caseSensitive) {
+        return caseSensitive ? a.equals(b) : a.equalsIgnoreCase(b);
     }
 
     public static void main(String[] args) {
         boolean caseSensitive = !(args.length > 0 && args[0].equals("-i"));
         int first = caseSensitive ? 0 : 1;
         if (args.length - first < 2) {
-            System.out.println("Usage: java recursion.FileSearch [-i] <directory> <fileName> [<fileName> ...]");
+            System.out.println("Usage: java recursion.FileSearch [-i] <directory> <fileName>"
+                    + " [<fileName> ...]");
             System.exit(1);
         }
         File dir = new File(args[first]);
         List<String> names = Arrays.asList(args).subList(first + 1, args.length);
         try {
-            System.out.println("Searching " + dir.getAbsolutePath() + (caseSensitive ? " (case-sensitive)" : " (ignoring case)"));
-            for (Map.Entry<String, List<File>> result : searchAll(dir, names, caseSensitive).entrySet()) {
+            System.out.println("Searching " + dir.getAbsolutePath()
+                    + (caseSensitive ? " (case-sensitive)" : " (ignoring case)"));
+            Map<String, List<File>> results = searchAll(dir, names, caseSensitive);
+            for (Map.Entry<String, List<File>> result : results.entrySet()) {
                 List<File> files = result.getValue();
                 if (files.isEmpty()) {
                     System.out.println(result.getKey() + ": not found");

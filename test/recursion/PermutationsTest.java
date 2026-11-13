@@ -28,12 +28,14 @@ public class PermutationsTest {
     @Test
     public void testSingleCharacter() {
         assertEquals(Arrays.asList("a"), Permutations.generatePermutations("a", false));
-        assertEquals(Arrays.asList("a"), Permutations.generatePermutationsIterative("a", true));
+        assertEquals(Arrays.asList("a"),
+                Permutations.generatePermutationsIterative("a", true));
     }
 
     @Test
     public void testTwoCharacters() {
-        assertEquals(setOf("ab", "ba"), new HashSet<>(Permutations.generatePermutations("ab", false)));
+        List<String> perms = Permutations.generatePermutations("ab", false);
+        assertEquals(setOf("ab", "ba"), new HashSet<>(perms));
     }
 
     @Test
@@ -67,7 +69,8 @@ public class PermutationsTest {
     @Test
     public void testAllSameUnique() {
         assertEquals(Arrays.asList("aaa"), Permutations.generatePermutations("aaa", true));
-        assertEquals(Arrays.asList("aaa"), Permutations.generatePermutationsIterative("aaa", true));
+        assertEquals(Arrays.asList("aaa"),
+                Permutations.generatePermutationsIterative("aaa", true));
     }
 
     @Test
